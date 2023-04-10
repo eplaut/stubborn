@@ -1,10 +1,10 @@
 from typing import Dict
 
-from litestar import Litestar, get, HttpMethod
+from litestar import Litestar, HttpMethod
 from litestar.handlers.http_handlers.decorators import HTTPRouteHandler
 
 
-@HTTPRouteHandler("/", http_method=HttpMethod)
+@HTTPRouteHandler("/", http_method=list(HttpMethod))
 def hello_world() -> Dict[str, str]:
     """Keeping the tradition alive with hello world."""
     return {"hello": "world"}
