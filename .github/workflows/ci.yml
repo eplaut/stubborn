@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '**'
+  pull_request:
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+
+    - name: Install pipenv
+      run: |
+        python -m pip install --upgrade pipenv
+
+    - name: Clean Virtualenv
+      run: |
+        rm -rf ~/.local/share/virtualenvs/*
+
+    - id: cache-pipenv
+      uses: actions/cache@v3
+      with:
+        path: ~/.local/share/virtualenvs
+        key: ${{ runner.os }}-${{ github.workflow }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}-dev
+
+    - name: Install dependencies
+      if: steps.cache-pipenv.outputs.cache-hit != 'true'
+      run: |
+        pipenv sync --dev
+
+    - name: Mypy Annotation check
+      run: |
+        PYTHONPATH=$PYTHONPATH:$PWD/ pipenv run mypy ./
+
+    - name: Black formatting check
+      run: |
+        pipenv run black --line-length 120 --diff --check .
+
+    - name: Analysing the code with pylint
+      run: |
+        pipenv run pylint */
