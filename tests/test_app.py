@@ -1,4 +1,3 @@
-from litestar import get, Response, MediaType
 from litestar.testing import create_test_client
 
 from stubborn import Stubborn
@@ -41,7 +40,7 @@ def test_register_without_count():
         expected_response_1 = {"result": "success"}
         path = "/test"
         client.post("/_register", json={"path": path, "method": "GET", "response": expected_response_1})
-        for i in range(13):
+        for _ in range(13):
             res = client.get(path)
             assert res.status_code == 200
             assert res.json() == expected_response_1
