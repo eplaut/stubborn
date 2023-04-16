@@ -1,8 +1,10 @@
-from typing import Dict
+from typing import Dict, Optional
 
-from litestar import Litestar, Request, HttpMethod, Controller, post, route, Response
+from litestar import Litestar, Request, HttpMethod, Controller, post, route, Response as LitestarResponse
 from litestar.exceptions import NotFoundException
 from litestar.datastructures import State
+
+from .response import Response
 
 
 class Stubborn(Controller):
@@ -11,23 +13,15 @@ class Stubborn(Controller):
         res = await request.json()
         if res["path"] not in state:
             state[res["path"]] = {}
-        state[res["path"]][res["method"].lower()] = (
-            float(res.get("count", "inf")),
-            res["response"],
-            int(res.get("status_code", 200)),
-        )
+        state[res["path"]][res["method"].lower()] = Response(res)
         return {"result": "success"}
 
     @route("{path:path}", http_method=list(HttpMethod))
-    def replay(self, path: str, state: State, request: Request) -> Response:
-        res = state.get(path, {}).get(request.method.lower())
-        if res is None:
+    def replay(self, path: str, state: State, request: Request) -> LitestarResponse:
+        response: Optional[Response] = state.get(path, {}).get(request.method.lower())
+        if response is None:
             raise NotFoundException
-        count, response, status_code = res
-        if count == 0:
-            raise NotFoundException
-        state[path][request.method.lower()] = (count - 1, response, status_code)
-        return Response(response, status_code=status_code)
+        return response.response
 
 
 app = Litestar(route_handlers=[Stubborn])
