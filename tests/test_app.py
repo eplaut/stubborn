@@ -38,10 +38,9 @@ def test_register_with_count():
 
 def test_register_without_count():
     with create_test_client([Stubborn]) as client:
-        expected_response_1 = {'result': 'success'}
-        path = '/test'
-        client.post('/_register',
-                    json={'path': path, 'method': 'GET', 'response': expected_response_1})
+        expected_response_1 = {"result": "success"}
+        path = "/test"
+        client.post("/_register", json={"path": path, "method": "GET", "response": expected_response_1})
         for i in range(13):
             res = client.get(path)
             assert res.status_code == 200
