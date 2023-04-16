@@ -51,3 +51,7 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         pipenv run pylint */
+
+    - name: Run tests
+      run: |
+          pipenv run pytest -vs tests/
