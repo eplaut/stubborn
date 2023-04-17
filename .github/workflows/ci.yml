@@ -54,4 +54,4 @@ jobs:
 
     - name: Run tests
       run: |
-          PYTHONPATH=$PWD:$PYTHONPATH pipenv run pytest -vs tests/
+          pipenv run pytest -vs tests/
