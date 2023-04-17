@@ -1,1 +1,1 @@
-from .app import Stubborn
+from .controller import Stubborn
